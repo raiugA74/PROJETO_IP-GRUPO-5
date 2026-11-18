@@ -9,13 +9,13 @@ class Player:
         self.color = PLAYER_COLOR
 
     def move(self, keys):
-        if keys[pygame.K_LEFT] or keys[pygame.K_a]:  # movimentação do ppersonagem com AWSD ou setas.
+        if keys[pygame.K_LEFT] or keys[pygame.K_a]:  # movimentação do personagem com AWSD ou setas.
             self.rect.x -= PLAYER_SPEED
-        if keys[pygame.K_RIGHT] or keys[pygame.K_d]:
+        if keys[pygame.K_RIGHT] or keys[pygame.K_d]: #seta direita ou D
             self.rect.x += PLAYER_SPEED
-        if keys[pygame.K_UP] or keys[pygame.K_w]:
+        if keys[pygame.K_UP] or keys[pygame.K_w]: #seta cima ou W
             self.rect.y -= PLAYER_SPEED
-        if keys[pygame.K_DOWN] or keys[pygame.K_s]:
+        if keys[pygame.K_DOWN] or keys[pygame.K_s]: #seta baixo ou S
             self.rect.y += PLAYER_SPEED
 
         self.keep_inside_screen()   # garante que o player não sai dos limites da tela
