@@ -15,3 +15,15 @@ BACKGROUND_COLOR = (20, 20, 40)
 TEXT_COLOR = (255, 255, 255)
 SCOREBOARD_FONT_SIZE = 22       #features do cenário 
 SCOREBOARD_LINE_HEIGHT = 26
+
+# Para saber em qual mundo o jogador está
+WORLD_LIGHT = "light"   # Representa o mundo da Luz
+WORLD_SHADOW = "shadow" # Representa o mundo da Sombra
+
+# Cores de fundo bg = background
+BG_LIGHT = (255, 224, 178)  # Cor de fundo quente (bege/laranja claro) para o mundo da Luz
+BG_SHADOW = (32, 18, 66)    # Cor de fundo escura (roxo profundo) para o mundo da Sombra
+
+# Cores do personagem em cada mundo (para contrastar com o fundo)
+PLAYER_LIGHT = (58, 46, 84)     # Jogador escuro no mundo claro (Luz)
+PLAYER_SHADOW = (238, 240, 255) # Jogador claro/branco no mundo escuro (Sombra)
