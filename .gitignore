@@ -1,0 +1,19 @@
+# Ambientes virtuais Python (env / venv)
+env/
+venv/
+.venv/
+ENV/
+
+# Cache e arquivos compilados pelo Python
+__pycache__/
+*.py[cod]
+*$py.class
+
+# Variáveis de ambiente locais
+.env
+
+# Configurações locais de editores e sistema operacional
+.vscode/
+.idea/
+.DS_Store
+Thumbs.db
