@@ -5,6 +5,7 @@ from constants import (
     PLAYER_LIGHT, PLAYER_SHADOW
 )
 from classes.player import Player
+from classes.game_object import Platform
 
 pygame.init()  # liga o PyGame e inicia o jogo
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))  # cria a janela
@@ -13,6 +14,12 @@ clock = pygame.time.Clock()  # controla a velocidade do jogo
 
 player = Player(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)  # cria o objeto jogador
 current_world = WORLD_LIGHT  # começa no mundo da Luz
+
+platforms = [
+    Platform(0, 460, SCREEN_WIDTH, 40, world=None),          # Chão (existe nos dois)
+    Platform(180, 350, 160, 20, world=WORLD_LIGHT),          # Só sólida na Luz
+    Platform(460, 260, 160, 20, world=WORLD_SHADOW),         # Só sólida na Sombra
+]
 
 running = True
 while running:  # loop principal: repete até fechar a janela
@@ -39,6 +46,8 @@ while running:  # loop principal: repete até fechar a janela
         player.color = PLAYER_SHADOW #jogador na cor clara, player_shadow é o player no mundo shadow
 
     screen.fill(bg_color)
+    for plat in platforms:
+        plat.draw(screen, current_world)
     player.draw(screen)
     pygame.display.flip()
 
