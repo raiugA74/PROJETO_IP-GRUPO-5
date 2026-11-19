@@ -5,7 +5,6 @@ from constants import (
     PLAYER_LIGHT, PLAYER_SHADOW
 )
 from classes.player import Player
-
 from classes.game_object import Platform
 
 pygame.init()  # liga o PyGame e inicia o jogo
