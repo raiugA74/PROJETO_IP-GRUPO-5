@@ -33,3 +33,8 @@ PLAT_LIGHT = (172, 118, 66)        # Marrom para plataforma sólida na Luz
 PLAT_SHADOW = (88, 74, 168)        # Roxo para plataforma sólida na Sombra
 PLAT_GHOST_LIGHT = (225, 185, 140) # Tom claro para contorno fantasma na Luz
 PLAT_GHOST_SHADOW = (140, 110, 220)# Tom lilás para contorno fantasma na Sombra
+
+GRAVITY = 1      # quanto a velocidade de queda aumenta por quadro
+JUMP_FORCE = -16     # velocidade inicial do pulo (negativo = para cima)
+MAX_FALL_SPEED = 15   # limite da velocidade de queda
+JUMP_CUT = 0.5  
