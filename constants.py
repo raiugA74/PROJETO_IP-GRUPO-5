@@ -27,3 +27,8 @@ BG_SHADOW = (32, 18, 66)    # Cor de fundo escura (roxo profundo) para o mundo d
 # Cores do personagem em cada mundo (para contrastar com o fundo)
 PLAYER_LIGHT = (58, 46, 84)     # Jogador escuro no mundo claro (Luz)
 PLAYER_SHADOW = (238, 240, 255) # Jogador claro/branco no mundo escuro (Sombra)
+
+GRAVITY = 1      # quanto a velocidade de queda aumenta por quadro
+JUMP_FORCE = -16     # velocidade inicial do pulo (negativo = para cima)
+MAX_FALL_SPEED = 15   # limite da velocidade de queda
+JUMP_CUT = 0.5 
