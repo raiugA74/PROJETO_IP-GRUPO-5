@@ -5,7 +5,7 @@ from constants import (
     PLAYER_LIGHT, PLAYER_SHADOW
 )
 from classes.player import Player
-from classes.game_object import Platform
+from classes.game_object import Platform 
 
 pygame.init()  # liga o PyGame e inicia o jogo
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))  # cria a janela
