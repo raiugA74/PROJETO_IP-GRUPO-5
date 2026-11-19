@@ -27,3 +27,9 @@ BG_SHADOW = (32, 18, 66)    # Cor de fundo escura (roxo profundo) para o mundo d
 # Cores do personagem em cada mundo (para contrastar com o fundo)
 PLAYER_LIGHT = (58, 46, 84)     # Jogador escuro no mundo claro (Luz)
 PLAYER_SHADOW = (238, 240, 255) # Jogador claro/branco no mundo escuro (Sombra)
+
+# Cores das plataformas por mundo
+PLAT_LIGHT = (172, 118, 66)        # Marrom para plataforma sólida na Luz
+PLAT_SHADOW = (88, 74, 168)        # Roxo para plataforma sólida na Sombra
+PLAT_GHOST_LIGHT = (225, 185, 140) # Tom claro para contorno fantasma na Luz
+PLAT_GHOST_SHADOW = (140, 110, 220)# Tom lilás para contorno fantasma na Sombra
