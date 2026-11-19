@@ -5,8 +5,8 @@ from constants import (
     PLAYER_LIGHT, PLAYER_SHADOW
 )
 from classes.player import Player
-from classes.scoreboard import Scoreboard
 
+from classes.game_object import Platform
 
 pygame.init()  # liga o PyGame e inicia o jogo
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))  # cria a janela
@@ -15,9 +15,6 @@ clock = pygame.time.Clock()  # controla a velocidade do jogo
 
 player = Player(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)  # cria o objeto jogador
 current_world = WORLD_LIGHT  # começa no mundo da Luz
-
-font = pygame.font.SysFont("arial", 22)  # o scoreboard
-scoreboard = Scoreboard()
 
 running = True
 while running:  # loop principal: repete até fechar a janela
@@ -44,7 +41,6 @@ while running:  # loop principal: repete até fechar a janela
         player.color = PLAYER_SHADOW #jogador na cor clara, player_shadow é o player no mundo shadow
 
     screen.fill(bg_color)
-    scoreboard.draw(screen, font)
     player.draw(screen)
     pygame.display.flip()
 
