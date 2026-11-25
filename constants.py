@@ -1,5 +1,5 @@
-SCREEN_WIDTH = 800     # tamanho da tela, fps e nome do jogo.
-SCREEN_HEIGHT = 500
+SCREEN_WIDTH = 900     # tamanho da tela, fps e nome do jogo.
+SCREEN_HEIGHT = 600
 FPS = 60
 WINDOW_TITLE = "Stefan Barrado"
 

@@ -7,20 +7,18 @@ from constants import (
 from classes.player import Player
 from classes.game_object import Platform
 from classes.scoreboard import Scoreboard
+from levels.level import Level
 
 pygame.init()  # liga o PyGame e inicia o jogo
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))  # cria a janela
 pygame.display.set_caption(WINDOW_TITLE)
 clock = pygame.time.Clock()  # controla a velocidade do jogo
 
-player = Player(SCREEN_WIDTH // 2, SCREEN_HEIGHT // 2)  # cria o objeto jogador
-current_world = WORLD_LIGHT  # começa no mundo da Luz
+level = Level(1)  # carrega a Fase 1
+spawn_x, spawn_y = level.player_spawn
+player = Player(spawn_x, spawn_y)  # cria o jogador no canto esquerdo sobre o chão
 
-platforms = [
-    Platform(0, 460, SCREEN_WIDTH, 40, world=None),          # Chão (existe nos dois)
-    Platform(180, 350, 160, 20, world=WORLD_LIGHT),          # Só sólida na Luz
-    Platform(460, 260, 160, 20, world=WORLD_SHADOW),         # Só sólida na Sombra
-]
+current_world = WORLD_LIGHT  # começa no mundo da Luz
 
 font = pygame.font.SysFont("arial", 22)  # fonte do placar
 scoreboard = Scoreboard()                # placar com a contagem por tipo
@@ -51,12 +49,11 @@ while running:  # loop principal: repete até fechar a janela
 
     # 4. Desenhar
     screen.fill(bg_color)
-    for platform in platforms:
-        platform.draw(screen, current_world)  # sólida no mundo dela, contorno no outro
+    level.draw(screen, current_world)  # desenha todas as plataformas da fase
     player.draw(screen)
-    scoreboard.draw(screen, font)  # placar por cima de tudo
+    scoreboard.draw(screen, font)      # placar por cima de tudo
     pygame.display.flip()
 
-    clock.tick(FPS)  # limita a 60 quadros por segundo
+    clock.tick(FPS)  # limita a 60 fps
 
 pygame.quit()
