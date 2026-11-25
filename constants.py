@@ -1,7 +1,7 @@
-SCREEN_WIDTH = 900     # tamanho da tela, fps e nome do jogo.
-SCREEN_HEIGHT = 600
+SCREEN_WIDTH = 1280     # tamanho da tela, fps e nome do jogo.
+SCREEN_HEIGHT = 720
 FPS = 60
-WINDOW_TITLE = "Stefan Barrado"
+WINDOW_TITLE = "One Vessel"
 
 PLAYER_SIZE = 32
 PLAYER_SPEED = 5                 # tamanho do player/velocidade/cor
