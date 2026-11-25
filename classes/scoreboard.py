@@ -2,7 +2,7 @@ class Scoreboard:
     """Conta quantos itens de cada tipo foram coletados."""
 
     def __init__(self):
-        self.counts = {"coletavel1": 0, "coletavel2": 0, "coletavel3": 0}  # dicionarios dos coletaveis
+        self.counts = {"light cristal": 0, "dark cristal": 0, "pó de penumbra": 0}  # dicionarios dos coletaveis
 
     def add(self, type_name):   # conta a quantidade de coletaveis somando 1 ao que foi coletado
         self.counts[type_name] += 1
