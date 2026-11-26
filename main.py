@@ -3,6 +3,8 @@ from re import sub
 import pygame
 import json
 import os
+import math
+import random
 
 from pygame import mouse
 
@@ -16,6 +18,55 @@ from classes.scoreboard import Scoreboard # a classe do placar
 from levels.level import Level # a classe da fase
 from classes.sprite_sheet import PlayerAnimator  # animação do jogador
 from audio import AudioManager                   # sons do jogo
+
+def desenhar_hover_menu(tela, lista_botoes, mouse_pos, particulas):
+    tempo_ms = pygame.time.get_ticks()
+    pulso = int((math.sin(tempo_ms * 0.008) + 1) * 20)
+
+    botao_hover = None
+    for rect in lista_botoes:
+        if rect.collidepoint(mouse_pos):
+            botao_hover = rect
+            break
+
+    novas_particulas = []
+    if botao_hover is not None and random.random() < 0.65:
+        px = random.randint(botao_hover.left - 10, botao_hover.right + 18)
+        py = random.randint(botao_hover.top - 4, botao_hover.bottom + 4)
+        vx = random.uniform(0.3, 1.2)
+        vy = random.uniform(-0.8, 0.8)
+        particulas.append([px, py, vx, vy, 220])
+
+    for p in particulas:
+        p[0] += p[2]
+        p[1] += p[3]
+        p[4] -= 5
+        if p[4] > 0:
+            surf_p = pygame.Surface((8, 8), pygame.SRCALPHA)
+            pygame.draw.circle(surf_p, (255, 235, 160, p[4]), (4, 4), 2)
+            tela.blit(surf_p, (int(p[0]), int(p[1])))
+            novas_particulas.append(p)
+    particulas[:] = novas_particulas
+
+    if botao_hover is not None:
+        # Brilho encaixado dentro do retângulo branco (descontando 4px em cada lado)
+        margem = 4
+        largura_glow = max(1, botao_hover.width - margem * 2) # 
+        altura_glow = max(1, botao_hover.height - margem * 2) # 
+
+        glow = pygame.Surface((largura_glow, altura_glow), pygame.SRCALPHA)
+        glow.fill((255, 230, 150, 35 + pulso))
+        tela.blit(glow, (botao_hover.x + margem, botao_hover.y + margem))
+
+        pygame.draw.rect(tela, (220, 220, 220), botao_hover, 2)
+
+        desloc_seta = int(math.sin(tempo_ms * 0.01) * 3)
+        sx = botao_hover.left - 18 + desloc_seta
+        sy = botao_hover.centery
+        seta = [(sx, sy - 7), (sx + 10, sy), (sx, sy + 7)]
+        pygame.draw.polygon(tela, (255, 240, 170), seta)
+    else:
+        particulas.clear()
 
 pygame.init()  # liga o PyGame e inicia o jogo
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))  # cria a janela
@@ -46,10 +97,10 @@ font = pygame.font.SysFont("arial", 22)  # fonte do placar
 scoreboard = Scoreboard()                # placar com a contagem por tipo
 
 estado = "menu"         # menu do jogo
-menu_image = pygame.image.load("assets/images/menu.png")
-opções_image = pygame.image.load("assets/images/opções.png")
-controle_image = pygame.image.load("assets/images/controle.png")
-som_image = pygame.image.load("assets/images/som.png")
+menu_image = pygame.image.load("assets/images/menu.png") #  carrega a imagem do menu
+opções_image = pygame.image.load("assets/images/opções.png") # carrega a imagem da tela de opções
+controle_image = pygame.image.load("assets/images/controle.png") # carrega a imagem da tela de controle
+som_image = pygame.image.load("assets/images/som.png") # carrega a imagem da tela de som
 
 rect_novo_jogo = pygame.Rect(550, 505, 181, 37) # cria retângulos para os botões do menu
 rect_continuar = pygame.Rect(545, 552, 190, 31) # define a posição e tamanho dos botões do menu
@@ -61,6 +112,8 @@ botao_pressionado = None  # botão que está sendo pressionado no momento
 
 hits = 0        # quantas vezes o jogador tomou dano (contador de teste)
 hit_timer = 0   # cronômetro pra não contar dano 60 vezes por segundo
+
+particulas_menu = []  # cada item: [x, y, vx, vy, alpha]
 
 running = True
 while running:  # loop principal: repete até fechar a janela
@@ -76,10 +129,8 @@ while running:  # loop principal: repete até fechar a janela
             screen.blit(overlay, botao_pressionado.topleft) # desenha a superfície sobre o botão pressionado
             pygame.draw.rect(screen, (255, 255, 255), botao_pressionado.move(2, 2), 2) # desenha um contorno branco no botão pressionado, deslocado 2 pixels para baixo e para a direita
         else:
-            botao_pressionado = None # se o botão não está sendo pressionado, zera a variável
-            for rect in botoes_menu: # passa por cada botão do menu
-                if rect.collidepoint(mouse_pos): # se o mouse está sobre o botão, desenha um contorno branco
-                    pygame.draw.rect(screen, (220, 220, 220), rect, 2) # desenha um contorno branco no botão que o mouse está sobre
+            botao_pressionado = None
+            desenhar_hover_menu(screen, botoes_menu, mouse_pos, particulas_menu)
 
         # 2. Eventos: marca ao apertar (MOUSEBUTTONDOWN) e executa ao soltar (MOUSEBUTTONUP)
         for event in pygame.event.get():
@@ -153,9 +204,7 @@ while running:  # loop principal: repete até fechar a janela
             pygame.draw.rect(screen, (255, 255, 255), botao_pressionado.move(2, 2), 2)
         else:
             botao_pressionado = None
-            for rect in botoes_opcoes:
-                if rect.collidepoint(mouse_pos):
-                    pygame.draw.rect(screen, (220, 220, 220), rect, 2)
+            desenhar_hover_menu(screen, botoes_opcoes, mouse_pos, particulas_menu)
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
