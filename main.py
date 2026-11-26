@@ -5,7 +5,7 @@ import os
 from constants import (
     SCREEN_WIDTH, SCREEN_HEIGHT, FPS, WINDOW_TITLE,
     WORLD_LIGHT, WORLD_SHADOW, BG_LIGHT, BG_SHADOW,
-    PLAYER_LIGHT, PLAYER_SHADOW
+    PLAYER_LIGHT, PLAYER_SHADOW, PLAYER_LIVES, INVULN_FRAMES
 )
 from classes.player import Player
 from classes.scoreboard import Scoreboard
