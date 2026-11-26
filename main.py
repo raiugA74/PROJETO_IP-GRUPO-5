@@ -146,7 +146,7 @@ while running:  # loop principal: repete até fechar a janela
                         current_world = WORLD_LIGHT
 
         # 2. Atualizar: movimento do jogador
-        player.move(pygame.key.get_pressed())
+        player.update(pygame.key.get_pressed(), level.platforms, current_world)
 
         # 3. Cor da tela e do jogador conforme o mundo
         if current_world == WORLD_LIGHT:
