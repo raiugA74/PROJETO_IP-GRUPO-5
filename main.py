@@ -106,6 +106,7 @@ while running:  # loop principal: repete até fechar a janela
                                 scoreboard.counts = save_data["scores"] # atualiza os pontos
                             estado = "jogo"
                     elif botao_pressionado == rect_opcoes: # se o jogador clicou no botão de opções, muda para a tela de opções
+                        estado_anterior = "menu"
                         estado = "opções"
                     elif botao_pressionado == rect_sair: # se o jogador clicou no botão de sair, encerra o jogo
                         running = False
@@ -122,14 +123,17 @@ while running:  # loop principal: repete até fechar a janela
         text_surface = font_titulo.render("Opções do Jogo", True, (255, 255, 255))
         text_som = font_titulo.render("som", True, (255, 255, 255))
         text_controle = font_titulo.render("controle", True, (255, 255, 255))
+        text_menu = font_titulo.render("menu", True, (255, 255, 255))
 
         screen.blit(text_surface, (SCREEN_WIDTH // 2 - text_surface.get_width() // 2, 100))
         screen.blit(text_som, (SCREEN_WIDTH // 2 - text_som.get_width() // 2, 150))
         screen.blit(text_controle, (SCREEN_WIDTH // 2 - text_controle.get_width() // 2, 200))
+        screen.blit(text_menu, (SCREEN_WIDTH // 2 - text_menu.get_width() // 2, 250))
 
         rect_som = pygame.Rect(SCREEN_WIDTH // 2 - 40, 155, 80, 30)
         rect_controle = pygame.Rect(SCREEN_WIDTH // 2 - 50, 205, 100, 30)
-        botoes_opcoes = [rect_som, rect_controle]
+        rect_menu = pygame.Rect(SCREEN_WIDTH // 2 - 40, 255, 80, 30)
+        botoes_opcoes = [rect_som, rect_controle, rect_menu]
 
         if botao_pressionado is not None and pygame.mouse.get_pressed()[0]:
             overlay = pygame.Surface((botao_pressionado.width, botao_pressionado.height), pygame.SRCALPHA)
@@ -147,7 +151,7 @@ while running:  # loop principal: repete até fechar a janela
                 running = False
             elif event.type == pygame.KEYDOWN and event.key == pygame.K_x:
                 som_clique.play()
-                estado = "menu"
+                estado = estado_anterior
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
                 for rect in botoes_opcoes:
                     if rect.collidepoint(event.pos):
@@ -160,6 +164,17 @@ while running:  # loop principal: repete até fechar a janela
                         estado = "som"
                     elif botao_pressionado == rect_controle:
                         estado = "controle"
+                    elif botao_pressionado == rect_menu:
+                        os.makedirs("save", exist_ok=True)
+                        with open("save/save.json", "w", encoding="utf-8") as f:
+                            json.dump({
+                                "player_x": player.rect.x,
+                                "player_y": player.rect.y,
+                                "current_world": current_world,
+                                "scores": scoreboard.counts
+                            }, f)
+                        estado = "menu"
+
                 botao_pressionado = None
 
         pygame.display.flip()
@@ -258,12 +273,14 @@ while running:  # loop principal: repete até fechar a janela
         # 1. Eventos: o que o jogador fez?
         for event in pygame.event.get(): # detecta eventos do jogo (teclado, mouse, etc.)
             if event.type == pygame.QUIT: # encerrar o jogo ao fechar a janela
-                json.dump({ # exporta a posição do jogador, mundo atual e pontuação para um arquivo JSON
-                    "player_x": player.rect.x,
-                    "player_y": player.rect.y,
-                    "current_world": current_world,
-                    "scores": scoreboard.counts
-                }, open("save/save.json", "w"))
+                os.makedirs("save", exist_ok=True)
+                with open("save/save.json", "w", encoding="utf-8") as f:
+                    json.dump({
+                        "player_x": player.rect.x,
+                        "player_y": player.rect.y,
+                        "current_world": current_world,
+                        "scores": scoreboard.counts
+                    }, f)
                 running = False
             if event.type == pygame.KEYDOWN: # detecta quando uma tecla é pressionada
                 if event.key == pygame.K_SPACE:  # alterna o mundo ao apertar ESPAÇO
@@ -273,8 +290,9 @@ while running:  # loop principal: repete até fechar a janela
                         current_world = WORLD_LIGHT # alterna para o mundo da Luz
                 elif event.key == pygame.K_ESCAPE: # volta para o menu ao apertar ESC
                     som_clique.play()
+                    estado_anterior = "jogo"
                     estado = "opções"
-                    
+
         # 2. Atualizar: movimento do jogador e inimigos
         player.move(pygame.key.get_pressed())
 
