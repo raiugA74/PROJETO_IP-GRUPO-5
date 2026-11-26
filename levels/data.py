@@ -1,9 +1,10 @@
 from constants import (
-    SCREEN_WIDTH, SCREEN_HEIGHT, PLAYER_SIZE,
+    SCREEN_WIDTH, SCREEN_HEIGHT, PLAYER_SIZE, ENEMY_SIZE,
     WORLD_LIGHT, WORLD_SHADOW
 )
 from classes.game_object import Platform
-
+from classes.hazard import Hazard
+from classes.enemy import Enemy
 
 def get_level_1():
     ground_height = 40
@@ -24,7 +25,18 @@ def get_level_1():
 
     # Listas prontas para pessoa dos coletáveis e pessoa dos inimigos preencherem
     collectibles = []
-    enemies = []
+
+    enemies = [
+        # espinho que só existe na Luz, parado no chão
+        Hazard(int(SCREEN_WIDTH * 0.34), ground_y - 20, 40, 20, world=WORLD_LIGHT),
+        # espinho que só existe na Sombra, parado no chão
+        Hazard(int(SCREEN_WIDTH * 0.58), ground_y - 20, 40, 20, world=WORLD_SHADOW),
+        # inimigo da Luz patrulhando perto do começo da fase
+        Enemy(int(SCREEN_WIDTH * 0.10), ground_y - ENEMY_SIZE,
+              int(SCREEN_WIDTH * 0.08), int(SCREEN_WIDTH * 0.20), world=WORLD_LIGHT),
+        # inimigo da Sombra patrulhando no fim da fase
+        Enemy(int(SCREEN_WIDTH * 0.80), ground_y - ENEMY_SIZE,
+              int(SCREEN_WIDTH * 0.75), int(SCREEN_WIDTH * 0.92), world=WORLD_SHADOW),]
 
     return {
         "name": "Floresta dos Elfos",

@@ -10,6 +10,8 @@ from constants import (
 from classes.player import Player
 from classes.scoreboard import Scoreboard
 from levels.level import Level
+from classes.sprite_sheet import PlayerAnimator  # animação do jogador
+from audio import AudioManager                   # sons do jogo
 
 pygame.init()  # liga o PyGame e inicia o jogo
 som_clique = pygame.mixer.Sound("assets/sounds/click.wav")  # carrega o som de clique
@@ -21,6 +23,8 @@ clock = pygame.time.Clock()  # controla a velocidade do jogo
 level = Level(1)  # carrega a Fase 1
 spawn_x, spawn_y = level.player_spawn
 player = Player(spawn_x, spawn_y)  # cria o jogador no canto esquerdo sobre o chão
+animador = PlayerAnimator()        # sprite do jogador (parado/andando)
+audio = AudioManager()             # gerenciador de sons
 
 current_world = WORLD_LIGHT  # começa no mundo da Luz
 
@@ -38,6 +42,9 @@ rect_voltar = pygame.Rect(20, 20, 100, 30)
 
 botoes_menu = [rect_novo_jogo, rect_continuar, rect_opcoes, rect_sair]
 botao_pressionado = None  # botão que está sendo pressionado no momento
+
+hits = 0        # quantas vezes o jogador tomou dano (contador de teste)
+hit_timer = 0   # cronômetro pra não contar dano 60 vezes por segundo
 
 running = True
 while running:  # loop principal: repete até fechar a janela
@@ -148,7 +155,18 @@ while running:  # loop principal: repete até fechar a janela
         # 2. Atualizar: movimento do jogador
         player.update(pygame.key.get_pressed(), level.platforms, current_world)
 
-        # 3. Cor da tela e do jogador conforme o mundo
+        for enemy in level.enemies:                 # passa por cada inimigo e espinho da fase
+            enemy.update()                          # inimigo dá um passo (espinho não faz nada)
+
+        if hit_timer > 0:                           # se ainda está no tempo de espera...
+            hit_timer -= 1                          # ...diminui 1 por quadro (60 = 1 segundo)
+
+        tocou = any(e.hits(player, current_world) for e in level.enemies)  # algo perigoso encostou?
+        if tocou and hit_timer == 0:                # encostou e já passou o tempo de espera
+            hits += 1                               # conta 1 dano
+            hit_timer = 60                          # 1 segundo sem poder levar dano de novo
+
+        # 3. Cor da tela e animação do jogador conforme o mundo
         if current_world == WORLD_LIGHT:
             bg_color = BG_LIGHT
             player.color = PLAYER_LIGHT
@@ -156,11 +174,21 @@ while running:  # loop principal: repete até fechar a janela
             bg_color = BG_SHADOW
             player.color = PLAYER_SHADOW
 
+        animador.update(player, current_world)  # escolhe a animação (parado ou andando)
+
         # 4. Desenhar
         screen.fill(bg_color)
-        level.draw(screen, current_world)  # desenha todas as plataformas da fase
-        player.draw(screen)
-        scoreboard.draw(screen, font)      # placar por cima de tudo
+        level.draw(screen, current_world)       # desenha todas as plataformas da fase
+
+        for enemy in level.enemies:             # desenha inimigos e espinhos
+            enemy.draw(screen, current_world)
+
+        animador.draw(screen, player)           # desenha a sprite do jogador (no lugar de player.draw)
+        scoreboard.draw(screen, font)           # placar por cima de tudo
+
+        texto = font.render(f"Danos: {hits}", True, (255, 255, 255))  # monta o texto "Danos: N"
+        screen.blit(texto, (SCREEN_WIDTH - 140, 10))                  # põe no canto direito de cima
+
         pygame.display.flip()
 
         clock.tick(FPS)  # limita a 60 quadros por segundo

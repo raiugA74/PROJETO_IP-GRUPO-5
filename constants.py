@@ -38,3 +38,10 @@ GRAVITY = 1      # quanto a velocidade de queda aumenta por quadro
 JUMP_FORCE = -16     # velocidade inicial do pulo (negativo = para cima)
 MAX_FALL_SPEED = 15   # limite da velocidade de queda
 JUMP_CUT = 0.5  
+
+# Inimigos e obstáculos
+HAZARD_COLOR = (200, 40, 40)          # cor do espinho quando está ativo
+HAZARD_GHOST_COLOR = (230, 150, 150)  # contorno do espinho quando é do outro mundo
+ENEMY_COLOR = (160, 30, 30)           # cor do inimigo
+ENEMY_SPEED = 2                       # quantos pixels o inimigo anda por quadro
+ENEMY_SIZE = 32                       # tamanho do inimigo (quadrado)
