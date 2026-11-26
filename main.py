@@ -18,11 +18,21 @@ from classes.sprite_sheet import PlayerAnimator  # animação do jogador
 from audio import AudioManager                   # sons do jogo
 
 pygame.init()  # liga o PyGame e inicia o jogo
-som_clique = pygame.mixer.Sound("assets/sounds/click.wav")  # carrega o som de clique
-som_clique.set_volume(0.5) # define o volume do som de clique (0.0 a 1.0)
 screen = pygame.display.set_mode((SCREEN_WIDTH, SCREEN_HEIGHT))  # cria a janela
 pygame.display.set_caption(WINDOW_TITLE) # define o título da janela
 clock = pygame.time.Clock()  # controla a velocidade do jogo
+
+som_clique = pygame.mixer.Sound("assets/sounds/click.wav")  # carrega o som de clique
+som_clique.set_volume(0.5) # define o volume do som de clique (0.0 a 1.0)
+
+volume_atual = 0.5  # <-- variáveis do áudio fora do while
+mudo = False
+
+def aplicar_audio():  # <-- função definida fora e antes do while
+    volume_efetivo = 0.0 if mudo else volume_atual
+    som_clique.set_volume(volume_efetivo)
+    if pygame.mixer.music.get_busy():
+        pygame.mixer.music.set_volume(volume_efetivo)
 
 level = Level(1)  # carrega a Fase 1
 spawn_x, spawn_y = level.player_spawn
@@ -182,26 +192,52 @@ while running:  # loop principal: repete até fechar a janela
 
     elif estado == "som":
         mouse_pos = pygame.mouse.get_pos()
-        screen.blit(som_image, (0, 0))
+        screen.fill((0, 0, 0))
 
         font_titulo = pygame.font.SysFont("arial", 30)
         text_som = font_titulo.render("Som", True, (255, 255, 255))
         screen.blit(text_som, (SCREEN_WIDTH // 2 - text_som.get_width() // 2, 100))
 
-        rect_mudo = pygame.Rect(SCREEN_WIDTH // 2 - 40, 155, 80, 30)
-        rect_volume = pygame.Rect(SCREEN_WIDTH // 2 - 40, 205, 80, 30)
-        botoes_som = [rect_mudo, rect_volume]
+        # 1. Botão de Mudo (mostra OFF quando normal, ON quando mutado)
+        texto_mudo = "Mudo: ON" if mudo else "Mudo: OFF"
+        mudo_surface = font.render(texto_mudo, True, (255, 255, 255))
+        rect_mudo = mudo_surface.get_rect(center=(SCREEN_WIDTH // 2, 170))
+        rect_mudo.inflate_ip(20, 10)
+        screen.blit(mudo_surface, mudo_surface.get_rect(center=rect_mudo.center))
 
-        if botao_pressionado is not None and pygame.mouse.get_pressed()[0]:
-            overlay = pygame.Surface((botao_pressionado.width, botao_pressionado.height), pygame.SRCALPHA)
-            overlay.fill((0, 0, 0, 110))
-            screen.blit(overlay, botao_pressionado.topleft)
-            pygame.draw.rect(screen, (255, 255, 255), botao_pressionado.move(2, 2), 2)
-        else:
-            botao_pressionado = None
-            for rect in botoes_som:
-                if rect.collidepoint(mouse_pos):
-                    pygame.draw.rect(screen, (220, 220, 220), rect, 2)
+        # 2. Barra de Volume (0 à esquerda, 1 à direita)
+        barra_x = SCREEN_WIDTH // 2 - 100
+        barra_y = 230
+        barra_largura = 200
+        barra_altura = 20
+        rect_barra = pygame.Rect(barra_x, barra_y, barra_largura, barra_altura)
+
+        lbl_zero = font.render("0", True, (255, 255, 255))
+        lbl_um = font.render("1", True, (255, 255, 255))
+        lbl_valor = font.render(f"{volume_atual:.1f}", True, (200, 200, 200))
+
+        screen.blit(lbl_zero, (barra_x - lbl_zero.get_width() - 12, barra_y - 2))
+        screen.blit(lbl_um, (barra_x + barra_largura + 12, barra_y - 2))
+        screen.blit(lbl_valor, (SCREEN_WIDTH // 2 - lbl_valor.get_width() // 2, barra_y + 28))
+
+        # Fundo e preenchimento da barra (0 na tela se mudo, mas volume_atual não é perdido)
+        pygame.draw.rect(screen, (70, 70, 70), rect_barra)
+        nivel_visual = 0.0 if mudo else volume_atual
+        largura_preenchida = int(barra_largura * nivel_visual)
+        if largura_preenchida > 0:
+            pygame.draw.rect(screen, (255, 255, 255), (barra_x, barra_y, largura_preenchida, barra_altura))
+        pygame.draw.rect(screen, (220, 220, 220), rect_barra, 2)
+
+        # Hover no botão de mudo
+        if rect_mudo.collidepoint(mouse_pos):
+            pygame.draw.rect(screen, (220, 220, 220), rect_mudo, 2)
+
+        # Arrastar ou clicar na barra para ajustar volume_atual (0.0 a 1.0)
+        if pygame.mouse.get_pressed()[0] and rect_barra.collidepoint(mouse_pos):
+            rel_x = (mouse_pos[0] - barra_x) / barra_largura
+            volume_atual = max(0.0, min(1.0, round(rel_x, 1)))
+            mudo = False
+            aplicar_audio()
 
         for event in pygame.event.get():
             if event.type == pygame.QUIT:
@@ -210,18 +246,17 @@ while running:  # loop principal: repete até fechar a janela
                 som_clique.play()
                 estado = "opções"
             elif event.type == pygame.MOUSEBUTTONDOWN and event.button == 1:
-                for rect in botoes_som:
-                    if rect.collidepoint(event.pos):
-                        botao_pressionado = rect
+                if rect_mudo.collidepoint(event.pos):
+                    mudo = not mudo
+                    aplicar_audio()
+                    if not mudo:
                         som_clique.play()
-                        break
-            elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
-                if botao_pressionado is not None and botao_pressionado.collidepoint(event.pos):
-                    if botao_pressionado == rect_mudo:
-                        audio.toggle_mute()
-                    elif botao_pressionado == rect_volume:
-                        audio.adjust_volume()
-                botao_pressionado = None
+                elif rect_barra.collidepoint(event.pos):
+                    rel_x = (event.pos[0] - barra_x) / barra_largura
+                    volume_atual = max(0.0, min(1.0, round(rel_x, 1)))
+                    mudo = False
+                    aplicar_audio()
+                    som_clique.play()
 
         pygame.display.flip()
 
