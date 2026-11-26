@@ -10,6 +10,8 @@ from constants import (
 from classes.player import Player
 from classes.scoreboard import Scoreboard
 from levels.level import Level
+from classes.sprite_sheet import PlayerAnimator  # animação do jogador
+from audio import AudioManager                   # sons do jogo
 
 pygame.init()  # liga o PyGame e inicia o jogo
 som_clique = pygame.mixer.Sound("assets/sounds/click.wav")  # carrega o som de clique
@@ -21,6 +23,8 @@ clock = pygame.time.Clock()  # controla a velocidade do jogo
 level = Level(1)  # carrega a Fase 1
 spawn_x, spawn_y = level.player_spawn
 player = Player(spawn_x, spawn_y)  # cria o jogador no canto esquerdo sobre o chão
+animador = PlayerAnimator()        # sprite do jogador (parado/andando)
+audio = AudioManager()             # gerenciador de sons
 
 current_world = WORLD_LIGHT  # começa no mundo da Luz
 
@@ -148,7 +152,7 @@ while running:  # loop principal: repete até fechar a janela
                     else:
                         current_world = WORLD_LIGHT
 
-        # 2. Atualizar: movimento do jogador
+        # 2. Atualizar: movimento do jogador e inimigos
         player.move(pygame.key.get_pressed())
 
         for enemy in level.enemies:                 # passa por cada inimigo e espinho da fase
@@ -162,7 +166,7 @@ while running:  # loop principal: repete até fechar a janela
             hits += 1                               # conta 1 dano
             hit_timer = 60                          # 1 segundo sem poder levar dano de novo
 
-        # 3. Cor da tela e do jogador conforme o mundo
+        # 3. Cor da tela e animação do jogador conforme o mundo
         if current_world == WORLD_LIGHT:
             bg_color = BG_LIGHT
             player.color = PLAYER_LIGHT
@@ -170,19 +174,21 @@ while running:  # loop principal: repete até fechar a janela
             bg_color = BG_SHADOW
             player.color = PLAYER_SHADOW
 
+        animador.update(player, current_world)  # escolhe a animação (parado ou andando)
+
         # 4. Desenhar
         screen.fill(bg_color)
-        level.draw(screen, current_world)  # desenha todas as plataformas da fase
+        level.draw(screen, current_world)       # desenha todas as plataformas da fase
 
-        for enemy in level.enemies:   # desenha inimigos e espinhos 
-            enemy.draw(screen, current_world)      
+        for enemy in level.enemies:             # desenha inimigos e espinhos
+            enemy.draw(screen, current_world)
 
-        player.draw(screen)
-        scoreboard.draw(screen, font)      # placar por cima de tudo
+        animador.draw(screen, player)           # desenha a sprite do jogador (no lugar de player.draw)
+        scoreboard.draw(screen, font)           # placar por cima de tudo
 
         texto = font.render(f"Danos: {hits}", True, (255, 255, 255))  # monta o texto "Danos: N"
         screen.blit(texto, (SCREEN_WIDTH - 140, 10))                  # põe no canto direito de cima
-        
+
         pygame.display.flip()
 
         clock.tick(FPS)  # limita a 60 quadros por segundo
