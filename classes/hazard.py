@@ -27,6 +27,9 @@ class Hazard:
 
     def draw(self, screen, current_world):
         if self.is_active(current_world):
-            pygame.draw.rect(screen, HAZARD_COLOR, self.rect)         # ativo: vermelho cheio
-        else:
-            pygame.draw.rect(screen, HAZARD_GHOST_COLOR, self.rect, 2)  # outro mundo: só contorno
+            # assim como as plataformas, os espinhos só serão vistos no seu determinado mundo
+            pygame.draw.polygon(screen, HAZARD_COLOR, [
+                (self.rect.left, self.rect.bottom),
+                (self.rect.centerx, self.rect.top),
+                (self.rect.right, self.rect.bottom)
+            ])

@@ -1,8 +1,7 @@
 import pygame
 from constants import (
-    WORLD_LIGHT, WORLD_SHADOW,
-    PLAT_LIGHT, PLAT_SHADOW,
-    PLAT_GHOST_LIGHT, PLAT_GHOST_SHADOW
+    WORLD_LIGHT,
+    PLAT_LIGHT, PLAT_SHADOW
 )
 
 
@@ -18,17 +17,11 @@ class Platform:
         return False
 
     def draw(self, screen, current_world):
+        # Só desenha a plataforma se ela existir no mundo atual (invisível no outro mundo)
         if self.is_solid(current_world):
-            # Desenha preenchida se estiver ativa no mundo atual
             if current_world == WORLD_LIGHT:
                 color = PLAT_LIGHT
             else:
                 color = PLAT_SHADOW
-            pygame.draw.rect(screen, color, self.rect, border_radius=4)
-        else:
-            # Desenha apenas a borda (fantasma) se pertencer ao outro mundo
-            if self.world == WORLD_LIGHT:
-                ghost_color = PLAT_GHOST_LIGHT
-            else:
-                ghost_color = PLAT_GHOST_SHADOW
-            pygame.draw.rect(screen, ghost_color, self.rect, 2, border_radius=4)
+            pygame.draw.rect(screen, color, self.rect, border_radius=4) 
+        #só enxergamos a plataforma quando estamos no mesmo mundo que ela
