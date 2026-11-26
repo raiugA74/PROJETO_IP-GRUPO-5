@@ -37,19 +37,14 @@ scoreboard = Scoreboard()                # placar com a contagem por tipo
 
 estado = "menu"         # menu do jogo
 menu_image = pygame.image.load("assets/images/menu.png")
+opções_image = pygame.image.load("assets/images/opções.png")
+controle_image = pygame.image.load("assets/images/controle.png")
+som_image = pygame.image.load("assets/images/som.png")
 
-rect_novo_jogo = pygame.Rect(550, 514, 181, 34) # cria retângulos para os botões do menu
-rect_continuar = pygame.Rect(548, 559, 185, 30) # define a posição e tamanho dos botões do menu
-rect_opcoes = pygame.Rect(578, 602, 125, 38) # define a posição e tamanho dos botões do menu
-rect_sair = pygame.Rect(602, 649, 78, 29) # define a posição e tamanho dos botões do menu
-
-def desenhar_botao_voltar(tela, fonte):
-    voltar_surface = fonte.render("Voltar", True, (255, 255, 255))
-    rect = voltar_surface.get_rect()
-    rect.inflate_ip(12, 6)
-    rect.topleft = (20, 20)
-    tela.blit(voltar_surface, voltar_surface.get_rect(center=rect.center))
-    return rect
+rect_novo_jogo = pygame.Rect(550, 505, 181, 37) # cria retângulos para os botões do menu
+rect_continuar = pygame.Rect(545, 552, 190, 31) # define a posição e tamanho dos botões do menu
+rect_opcoes = pygame.Rect(577, 595, 125, 38) # define a posição e tamanho dos botões do menu
+rect_sair = pygame.Rect(602, 643, 78, 30) # define a posição e tamanho dos botões do menu
 
 botoes_menu = [rect_novo_jogo, rect_continuar, rect_opcoes, rect_sair]
 botao_pressionado = None  # botão que está sendo pressionado no momento
@@ -117,7 +112,7 @@ while running:  # loop principal: repete até fechar a janela
     # 4. Tela de opções
     elif estado == "opções":
         mouse_pos = pygame.mouse.get_pos()
-        screen.fill((0, 0, 0))
+        screen.blit(opções_image, (0, 0))
 
         font_titulo = pygame.font.SysFont("arial", 30)
         text_surface = font_titulo.render("Opções do Jogo", True, (255, 255, 255))
@@ -128,12 +123,18 @@ while running:  # loop principal: repete até fechar a janela
         screen.blit(text_surface, (SCREEN_WIDTH // 2 - text_surface.get_width() // 2, 100))
         screen.blit(text_som, (SCREEN_WIDTH // 2 - text_som.get_width() // 2, 150))
         screen.blit(text_controle, (SCREEN_WIDTH // 2 - text_controle.get_width() // 2, 200))
-        screen.blit(text_menu, (SCREEN_WIDTH // 2 - text_menu.get_width() // 2, 250))
 
         rect_som = pygame.Rect(SCREEN_WIDTH // 2 - 40, 155, 80, 30)
         rect_controle = pygame.Rect(SCREEN_WIDTH // 2 - 50, 205, 100, 30)
-        rect_menu = pygame.Rect(SCREEN_WIDTH // 2 - 40, 255, 80, 30)
-        botoes_opcoes = [rect_som, rect_controle, rect_menu]
+
+        botoes_opcoes = [rect_som, rect_controle]
+        rect_menu = None
+
+        if estado_anterior == 'jogo':
+            text_menu = font_titulo.render("menu", True, (255, 255, 255))
+            screen.blit(text_menu, (SCREEN_WIDTH // 2 - text_menu.get_width() // 2, 250))
+            rect_menu = pygame.Rect(SCREEN_WIDTH // 2 - 40, 255, 80, 30)
+            botoes_opcoes.append(rect_menu)
 
         if botao_pressionado is not None and pygame.mouse.get_pressed()[0]:
             overlay = pygame.Surface((botao_pressionado.width, botao_pressionado.height), pygame.SRCALPHA)
@@ -164,7 +165,7 @@ while running:  # loop principal: repete até fechar a janela
                         estado = "som"
                     elif botao_pressionado == rect_controle:
                         estado = "controle"
-                    elif botao_pressionado == rect_menu:
+                    elif rect_menu is not None and botao_pressionado == rect_menu:
                         os.makedirs("save", exist_ok=True)
                         with open("save/save.json", "w", encoding="utf-8") as f:
                             json.dump({
@@ -181,7 +182,7 @@ while running:  # loop principal: repete até fechar a janela
 
     elif estado == "som":
         mouse_pos = pygame.mouse.get_pos()
-        screen.fill((0, 0, 0))
+        screen.blit(som_image, (0, 0))
 
         font_titulo = pygame.font.SysFont("arial", 30)
         text_som = font_titulo.render("Som", True, (255, 255, 255))
@@ -226,7 +227,7 @@ while running:  # loop principal: repete até fechar a janela
 
     elif estado == "controle":
         mouse_pos = pygame.mouse.get_pos()
-        screen.fill((0, 0, 0))
+        screen.blit(controle_image, (0, 0))
 
         font_titulo = pygame.font.SysFont("arial", 30)
         text_controle = font_titulo.render("Controle", True, (255, 255, 255))
