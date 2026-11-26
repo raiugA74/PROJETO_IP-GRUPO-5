@@ -34,11 +34,11 @@ scoreboard = Scoreboard()                # placar com a contagem por tipo
 estado = "menu"         # menu do jogo
 menu_image = pygame.image.load("assets/images/menu.png")
 
-rect_novo_jogo = pygame.Rect(550, 514, 181, 34)
-rect_continuar = pygame.Rect(548, 558, 185, 30)
-rect_opcoes = pygame.Rect(578, 602, 125, 38)
-rect_sair = pygame.Rect(602, 649, 78, 29)
-rect_voltar = pygame.Rect(20, 20, 100, 30)
+rect_novo_jogo = pygame.Rect(550, 514, 181, 34) # cria retângulos para os botões do menu
+rect_continuar = pygame.Rect(548, 559, 185, 30) # define a posição e tamanho dos botões do menu
+rect_opcoes = pygame.Rect(578, 602, 125, 38) # define a posição e tamanho dos botões do menu
+rect_sair = pygame.Rect(602, 649, 78, 29) # define a posição e tamanho dos botões do menu
+rect_voltar = pygame.Rect(20, 20, 100, 30) # define a posição e tamanho do botão de voltar no menu de opções
 
 botoes_menu = [rect_novo_jogo, rect_continuar, rect_opcoes, rect_sair]
 botao_pressionado = None  # botão que está sendo pressionado no momento
@@ -54,16 +54,16 @@ while running:  # loop principal: repete até fechar a janela
         mouse_pos = pygame.mouse.get_pos()
 
         # 1. Efeito visual enquanto segura o clique
-        if botao_pressionado is not None and pygame.mouse.get_pressed()[0]:
-            overlay = pygame.Surface((botao_pressionado.width, botao_pressionado.height), pygame.SRCALPHA)
-            overlay.fill((0, 0, 0, 110))
-            screen.blit(overlay, botao_pressionado.topleft)
-            pygame.draw.rect(screen, (255, 255, 255), botao_pressionado.move(2, 2), 2)
+        if botao_pressionado is not None and pygame.mouse.get_pressed()[0]: # se o botão está sendo pressionado...
+            overlay = pygame.Surface((botao_pressionado.width, botao_pressionado.height), pygame.SRCALPHA) # cria uma superfície transparente do tamanho do botão
+            overlay.fill((0, 0, 0, 110)) # preenche a superfície com uma cor preta semi-transparente (110 = 43% de opacidade)
+            screen.blit(overlay, botao_pressionado.topleft) # desenha a superfície sobre o botão pressionado
+            pygame.draw.rect(screen, (255, 255, 255), botao_pressionado.move(2, 2), 2) # desenha um contorno branco no botão pressionado, deslocado 2 pixels para baixo e para a direita
         else:
-            botao_pressionado = None
-            for rect in botoes_menu:
-                if rect.collidepoint(mouse_pos):
-                    pygame.draw.rect(screen, (220, 220, 220), rect, 2)
+            botao_pressionado = None # se o botão não está sendo pressionado, zera a variável
+            for rect in botoes_menu: # passa por cada botão do menu
+                if rect.collidepoint(mouse_pos): # se o mouse está sobre o botão, desenha um contorno branco
+                    pygame.draw.rect(screen, (220, 220, 220), rect, 2) # desenha um contorno branco no botão que o mouse está sobre
 
         # 2. Eventos: marca ao apertar (MOUSEBUTTONDOWN) e executa ao soltar (MOUSEBUTTONUP)
         for event in pygame.event.get():
@@ -83,7 +83,7 @@ while running:  # loop principal: repete até fechar a janela
                         botao_pressionado = rect
                         som_clique.play()
                         break
-
+            # 3. Executa a ação do botão ao soltar o clique
             elif event.type == pygame.MOUSEBUTTONUP and event.button == 1:
                 pos = event.pos
                 if botao_pressionado is not None and botao_pressionado.collidepoint(pos):
@@ -107,31 +107,63 @@ while running:  # loop principal: repete até fechar a janela
                 botao_pressionado = None
 
         pygame.display.flip()
-
+    # 4. Tela de opções
     elif estado == "opções":
-        screen.fill((0, 0, 0))
-        font_titulo = pygame.font.SysFont("arial", 30)
-        text_surface = font_titulo.render("Opções do Jogo", True, (255, 255, 255))
-        screen.blit(text_surface, (SCREEN_WIDTH // 2 - text_surface.get_width() // 2, 100))
 
-        voltar_surface = font.render("Voltar", True, (255, 255, 255))
-        voltar_rect = voltar_surface.get_rect(topleft=(20, 20))
-        screen.blit(voltar_surface, voltar_rect)
+        screen.fill((0, 0, 0)) # preenche a tela de opções com preto
+        font_titulo = pygame.font.SysFont("arial", 30) # cria a fonte para os títulos
+        text_surface = font_titulo.render("Opções do Jogo", True, (255, 255, 255)) # cria a superfície do texto do título
+        text_som = font_titulo.render("som", True, (255, 255, 255)) # cria a superfície do texto do título
+        text_controle = font_titulo.render("controle", True, (255, 255, 255)) # cria a superfície do texto do título
+        screen.blit(text_surface, (SCREEN_WIDTH // 2 - text_surface.get_width() // 2, 100)) # centraliza o título na tela
+        screen.blit(text_som, (SCREEN_WIDTH // 2 - text_som.get_width() // 2, 150)) # centraliza o texto "som" na tela
+        screen.blit(text_controle, (SCREEN_WIDTH // 2 - text_controle.get_width() // 2, 200)) # centraliza o texto "controle" na tela
 
-        for event in pygame.event.get():
-            if event.type == pygame.QUIT:
-                json.dump({
+        voltar_surface = font.render("Voltar", True, (255, 255, 255)) # cria a superfície do texto do botão de voltar
+        rect_voltar = voltar_surface.get_rect()  # cria um retângulo para o botão de voltar
+        rect_voltar.inflate_ip(6, 3) # aumenta o retângulo para dar espaço ao texto
+        rect_voltar.topleft = (20, 20) # define a posição do retângulo
+        text_pos = voltar_surface.get_rect(center=rect_voltar.center) # centraliza o texto no retângulo
+        screen.blit(voltar_surface, text_pos) # desenha o texto do botão de voltar
+
+        rect_som = pygame.Rect(SCREEN_WIDTH // 2 - 40, 155, 80, 30) # cria um retângulo para o botão de som
+        rect_controle = pygame.Rect(SCREEN_WIDTH // 2 - 50, 205, 100, 30) # cria um retângulo para o botão de controle
+
+        botoes_opcoes = [rect_voltar, rect_som, rect_controle]  # lista de botões na tela de opções
+        mouse_pos = pygame.mouse.get_pos()
+        
+        if botao_pressionado is not None and pygame.mouse.get_pressed()[0]: # se o botão está sendo pressionado...
+            overlay = pygame.Surface((botao_pressionado.width, botao_pressionado.height), pygame.SRCALPHA) # cria uma superfície transparente do tamanho do botão
+            overlay.fill((0, 0, 0, 110)) # preenche a superfície com uma cor preta semi-transparente (110 = 43% de opacidade)
+            screen.blit(overlay, botao_pressionado.topleft) # desenha a superfície sobre o botão pressionado
+            pygame.draw.rect(screen, (255, 255, 255), botao_pressionado.move(2, 2), 2) # desenha um contorno branco no botão pressionado, deslocado 2 pixels para baixo e para a direita
+        else:
+            botao_pressionado = None # se o botão não está sendo pressionado, zera a variável
+            for rect in botoes_opcoes: # passa por cada botão das opções
+                if rect.collidepoint(mouse_pos): # se o mouse está sobre o botão, desenha um contorno branco
+                    pygame.draw.rect(screen, (220, 220, 220), rect, 2) # desenha um contorno branco no botão que o mouse está sobre
+        
+        for event in pygame.event.get(): # eventos do menu de opções
+            if event.type == pygame.QUIT: # se o jogador fecha a janela, salva o jogo e encerra
+                json.dump({ # salva a posição do jogador, mundo atual e pontuação em um arquivo JSON
                     "player_x": player.rect.x,
                     "player_y": player.rect.y,
                     "current_world": current_world,
                     "scores": scoreboard.counts
                 }, open("save/save.json", "w"))
                 running = False
-            elif event.type == pygame.MOUSEBUTTONDOWN:
-                mouse_pos = pygame.mouse.get_pos()
-                if voltar_rect.collidepoint(mouse_pos):
+            elif event.type == pygame.MOUSEBUTTONDOWN: # se o jogador apertou o botão do mouse, verifica se clicou em algum botão
+                mouse_pos = event.pos
+                mouse_pos = pygame.mouse.get_pos() # obtém a posição do mouse
+                for rect in botoes_opcoes:
+                    if rect.collidepoint(mouse_pos): # se o mouse está sobre o botão, marca como pressionado
+                        botao_pressionado = rect
+                        som_clique.play() # toca o som de clique
+                        break
+                if rect_voltar.collidepoint(mouse_pos): # se o jogador clicou no botão de voltar, volta para o menu principal
                     som_clique.play()
                     estado = "menu"
+                    
         pygame.display.flip()
 
     elif estado == "jogo":
