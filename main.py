@@ -5,7 +5,7 @@ import os
 from constants import (
     SCREEN_WIDTH, SCREEN_HEIGHT, FPS, WINDOW_TITLE,
     WORLD_LIGHT, WORLD_SHADOW, BG_LIGHT, BG_SHADOW,
-    PLAYER_LIGHT, PLAYER_SHADOW
+    PLAYER_LIGHT, PLAYER_SHADOW, PLAYER_LIVES, INVULN_FRAMES
 )
 from classes.player import Player
 from classes.scoreboard import Scoreboard
@@ -152,8 +152,8 @@ while running:  # loop principal: repete até fechar a janela
                     else:
                         current_world = WORLD_LIGHT
 
-        # 2. Atualizar: movimento do jogador e inimigos
-        player.move(pygame.key.get_pressed())
+        # 2. Atualizar: movimento do jogador
+        player.update(pygame.key.get_pressed(), level.platforms, current_world)
 
         for enemy in level.enemies:                 # passa por cada inimigo e espinho da fase
             enemy.update()                          # inimigo dá um passo (espinho não faz nada)

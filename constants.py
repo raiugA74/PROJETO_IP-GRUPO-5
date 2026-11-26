@@ -6,6 +6,16 @@ WINDOW_TITLE = "One Vessel"
 PLAYER_SIZE = 32
 PLAYER_SPEED = 5                 # tamanho do player/velocidade/cor
 PLAYER_COLOR = (240, 240, 240)
+PLAYER_LIVES = 3   # quantidade de vidas
+INVULN_FRAMES = 60   # 1 segundo sem levar dano depois de ser atingido
+# Cores do personagem em cada mundo (para contrastar com o fundo)
+PLAYER_LIGHT = (58, 46, 84)     # Jogador escuro no mundo claro (Luz)
+PLAYER_SHADOW = (238, 240, 255) # Jogador claro/branco no mundo escuro (Sombra)
+
+GRAVITY = 1      # quanto a velocidade de queda aumenta por quadro
+JUMP_FORCE = -16     # velocidade inicial do pulo (negativo = para cima)
+MAX_FALL_SPEED = 15   # limite da velocidade de queda
+JUMP_CUT = 0.5  
 
 COLLECTIBLE_SIZE = 24
 COLLECTIBLES_PER_TYPE = 5      # dimensoes dos coletaveis
@@ -24,20 +34,11 @@ WORLD_SHADOW = "shadow" # Representa o mundo da Sombra
 BG_LIGHT = (255, 224, 178)  # Cor de fundo quente (bege/laranja claro) para o mundo da Luz
 BG_SHADOW = (32, 18, 66)    # Cor de fundo escura (roxo profundo) para o mundo da Sombra
 
-# Cores do personagem em cada mundo (para contrastar com o fundo)
-PLAYER_LIGHT = (58, 46, 84)     # Jogador escuro no mundo claro (Luz)
-PLAYER_SHADOW = (238, 240, 255) # Jogador claro/branco no mundo escuro (Sombra)
-
 # Cores das plataformas por mundo
 PLAT_LIGHT = (172, 118, 66)        # Marrom para plataforma sólida na Luz
 PLAT_SHADOW = (88, 74, 168)        # Roxo para plataforma sólida na Sombra
 PLAT_GHOST_LIGHT = (225, 185, 140) # Tom claro para contorno fantasma na Luz
 PLAT_GHOST_SHADOW = (140, 110, 220)# Tom lilás para contorno fantasma na Sombra
-
-GRAVITY = 1      # quanto a velocidade de queda aumenta por quadro
-JUMP_FORCE = -16     # velocidade inicial do pulo (negativo = para cima)
-MAX_FALL_SPEED = 15   # limite da velocidade de queda
-JUMP_CUT = 0.5  
 
 # Inimigos e obstáculos
 HAZARD_COLOR = (200, 40, 40)          # cor do espinho quando está ativo
