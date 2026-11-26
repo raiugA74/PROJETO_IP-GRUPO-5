@@ -10,6 +10,8 @@ from constants import (
 from classes.player import Player
 from classes.scoreboard import Scoreboard
 from levels.level import Level
+from classes.sprite_sheet import PlayerAnimator  # animação do jogador
+from audio import AudioManager                   # sons do jogo
 
 pygame.init()  # liga o PyGame e inicia o jogo
 som_clique = pygame.mixer.Sound("assets/sounds/click.wav")  # carrega o som de clique
@@ -21,6 +23,8 @@ clock = pygame.time.Clock()  # controla a velocidade do jogo
 level = Level(1)  # carrega a Fase 1
 spawn_x, spawn_y = level.player_spawn
 player = Player(spawn_x, spawn_y)  # cria o jogador no canto esquerdo sobre o chão
+animador = PlayerAnimator()        # sprite do jogador (parado/andando)
+audio = AudioManager()             # sons, ex: audio.play("coletar")
 
 current_world = WORLD_LIGHT  # começa no mundo da Luz
 
@@ -156,10 +160,12 @@ while running:  # loop principal: repete até fechar a janela
             bg_color = BG_SHADOW
             player.color = PLAYER_SHADOW
 
+        animador.update(player, current_world)  # escolhe a animação (parado ou andando)
+
         # 4. Desenhar
         screen.fill(bg_color)
         level.draw(screen, current_world)  # desenha todas as plataformas da fase
-        player.draw(screen)
+        animador.draw(screen, player)      # desenha a sprite (ou o retângulo se a imagem não carregar)
         scoreboard.draw(screen, font)      # placar por cima de tudo
         pygame.display.flip()
 
