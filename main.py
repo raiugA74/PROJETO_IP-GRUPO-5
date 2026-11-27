@@ -464,7 +464,7 @@ while running:  # loop principal: repete até fechar a janela
             animador.draw(screen, player)       # desenha a sprite do jogador (no lugar de player.draw)
         scoreboard.draw(screen, font)           # placar por cima de tudo
 
-        texto_vidas = font.render(f"Vidas: {vidas}", True, (255, 255, 255)) #fica no canto direito como um contador númerico, mas penso que três corações possam representar melhor, não sei
+        texto_vidas = font.render(f"Vidas: {vidas}", True, (255, 255, 255)) #fica no canto direito como um contador númerico, mas penso que três corações possam representar melhor, não seigit add .
         screen.blit(texto_vidas, (SCREEN_WIDTH - 140, 10))
 
         pygame.display.flip()

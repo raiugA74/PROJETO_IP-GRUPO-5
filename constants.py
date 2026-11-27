@@ -7,7 +7,7 @@ PLAYER_SIZE = 32
 PLAYER_SPEED = 5                 # tamanho do player/velocidade/cor
 PLAYER_COLOR = (240, 240, 240)
 PLAYER_LIVES = 3   # quantidade de vidas
-INVULN_FRAMES = 60   # 1 segundo sem levar dano depois de ser atingido
+INVULN_FRAMES = 30   # 1 segundo sem levar dano depois de ser atingido
 # Cores do personagem em cada mundo (para contrastar com o fundo)
 PLAYER_LIGHT = (58, 46, 84)     # Jogador escuro no mundo claro (Luz)
 PLAYER_SHADOW = (238, 240, 255) # Jogador claro/branco no mundo escuro (Sombra)
