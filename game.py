@@ -3,10 +3,12 @@ import pygame
 from constants import (
     SCREEN_WIDTH, SCREEN_HEIGHT, FPS, WINDOW_TITLE,
     WORLD_LIGHT, WORLD_SHADOW, BG_LIGHT, BG_SHADOW,
-    PLAYER_LIGHT, PLAYER_SHADOW, PLAYER_LIVES, INVULN_FRAMES
+    PLAYER_LIGHT, PLAYER_SHADOW, PLAYER_LIVES, INVULN_FRAMES,
+    LEVEL_WIDTH, LEVEL_HEIGHT
 )
 from classes.player import Player # a classe do jogador
 from classes.scoreboard import Scoreboard # a classe do placar
+from classes.camera import Camera  # camera que se move
 from levels.level import Level # a classe da fase
 from classes.sprite_sheet import PlayerAnimator  # animação do jogador
 from audio import AudioManager                   # sons do jogo
@@ -34,6 +36,9 @@ class Game:
         self.audio = AudioManager()             # gerenciador de sons
 
         self.current_world = WORLD_LIGHT  # começa no mundo da Luz
+
+        self.camera = Camera()
+        self.mundo_surface = pygame.Surface((LEVEL_WIDTH, LEVEL_HEIGHT))  # a camera movel
 
         self.font = pygame.font.SysFont("arial", 22)  # fonte do placar
         self.scoreboard = Scoreboard()                # placar com a contagem por tipo
@@ -76,6 +81,7 @@ class Game:
         self.hit_timer = INVULN_FRAMES         # invulnerável por um tempo logo após renascer
         self.animador.olhando_esquerda = False # renasce olhando para a direita, no sentido da fase até então
         self.animador.ultimo_x = self.player.rect.x # o teleporte não conta como "andou para a esquerda"
+        self.camera.update(self.player.rect, suave=False)
 
     def reiniciar_partida(self):
         # começa tudo do zero: vidas, danos e posição
@@ -140,6 +146,8 @@ class Game:
                 self.estado = "game_over"                # fim de jogo quando acabarem as vidas
             else:
                 self.respawnar()                         # volta ao ponto de respawn 
+                
+        self.camera.update(self.player.rect)    # camera segue o jogador
 
         # 3. Cor da tela e animação do jogador conforme o mundo
         if self.current_world == WORLD_LIGHT:
@@ -152,15 +160,21 @@ class Game:
         self.animador.update(self.player, self.current_world)  # escolhe a animação (parado ou andando)
 
         # 4. Desenhar
-        self.screen.fill(bg_color)
-        self.level.draw(self.screen, self.current_world)       # desenha todas as plataformas da fase
+                
+        self.mundo_surface.fill(bg_color)                          # pinta o fundo no "mundo inteiro" (3000 px), não só na tela
+        self.level.draw(self.mundo_surface, self.current_world)    # desenha as plataformas no mundo inteiro
 
-        for enemy in self.level.enemies:             # desenha inimigos e espinhos
-            enemy.draw(self.screen, self.current_world)
+        for enemy in self.level.enemies:                           # passa por cada inimigo e espinho
+            enemy.draw(self.mundo_surface, self.current_world)     # desenha no mundo inteiro
 
-        if self.hit_timer == 0 or (self.hit_timer // 5) % 2 == 0:   # pisca enquanto está invulnerável
-            self.animador.draw(self.screen, self.player)       # desenha a sprite do jogador (no lugar de player.draw)
-        self.scoreboard.draw(self.screen, self.font)           # placar por cima de tudo
+        if self.hit_timer == 0 or (self.hit_timer // 5) % 2 == 0:  # pisca enquanto está invulnerável
+            self.animador.draw(self.mundo_surface, self.player)    # desenha o jogador no mundo inteiro
+
+        # recorta só a parte que a câmera enxerga (um retângulo do tamanho da tela)
+        area = pygame.Rect(int(self.camera.x), int(self.camera.y), SCREEN_WIDTH, SCREEN_HEIGHT)
+        self.screen.blit(self.mundo_surface, (0, 0), area)         # cola esse recorte na tela, começando no canto (0, 0)
+
+        self.scoreboard.draw(self.screen, self.font)               # placar direto na tela, por isso fica parado (não anda com a câmera)
 
         texto_vidas = self.font.render(f"Vidas: {self.vidas}", True, (255, 255, 255)) #fica no canto direito como um contador númerico, mas penso que três corações possam representar melhor, não seigit add .
         self.screen.blit(texto_vidas, (SCREEN_WIDTH - 140, 10))
