@@ -15,40 +15,49 @@ def get_level_1():
     player_spawn = (130, ground_y - PLAYER_SIZE)
 
     platforms = [
-        # --- CHÃO PRINCIPAL (Neutro: aparece na Luz e na Sombra) ---
+        # --- CHÃO PRINCIPAL (Aparece na Luz e na Sombra) ---
         Platform(0, ground_y, SCREEN_WIDTH, ground_height, world=None),
 
-        # --- MUNDO DA LUZ ---
+        # MUNDO DA LUZ 
         # 1. Barranco baixo esquerdo (encaixa na pedra da arte)
         Platform(190, 560, 145, 100, world=WORLD_LIGHT),
-        # 2. Barranco alto esquerdo (canto superior esquerdo da arte - bom para cristal)
+        # 2. Barranco alto esquerdo (canto superior esquerdo - bom para cristal difícil)
         Platform(0, 445, 110, 215, world=WORLD_LIGHT),
-        # 3. Ilha flutuante centro-esquerda
-        Platform(430, 465, 160, 28, world=WORLD_LIGHT),
+        # 3. Ilha flutuante centro-esquerda (livre de inimigo para dar impulso no pulo)
+        Platform(415, 470, 130, 28, world=WORLD_LIGHT),
         # 4. Ilha flutuante centro-direita (ponto mais alto da fase)
-        Platform(760, 320, 170, 28, world=WORLD_LIGHT),
+        Platform(770, 315, 135, 28, world=WORLD_LIGHT),
+        # 5. Degrau alto direito (obriga troca Luz -> Sombra para alcançar a plataforma 7)
+        Platform(1010, 365, 115, 28, world=WORLD_LIGHT),
 
-        # --- MUNDO DA SOMBRA ---
-        # 5. Ponte flutuante central (liga as duas ilhas de Luz)
-        Platform(590, 390, 150, 28, world=WORLD_SHADOW),
-        # 6. Plataforma flutuante direita
-        Platform(970, 430, 150, 28, world=WORLD_SHADOW),
-        # 7. Barranco baixo direito (encaixa na pedra da área roxa da arte)
+        # MUNDO DA SOMBRA 
+        # 6. Ponte flutuante central (liga as duas ilhas de Luz)
+        Platform(590, 390, 130, 28, world=WORLD_SHADOW),
+        # 7. Plataforma flutuante direita (ponto intermediário com bom espaço de pouso)
+        Platform(910, 460, 130, 28, world=WORLD_SHADOW),
+        # 8. Barranco baixo direito (encaixa na pedra da área roxa da arte)
         Platform(1095, 555, 185, 105, world=WORLD_SHADOW),
     ]
 
     collectibles = []
 
     enemies = [
-        # Espinho da Luz no chão central (obriga a subir pelas plataformas ou trocar pra Sombra)
-        Hazard(500, ground_y - 20, 48, 20, world=WORLD_LIGHT),
-        # Espinho da Sombra no chão centro-direito
-        Hazard(820, ground_y - 20, 48, 20, world=WORLD_SHADOW),
+        #     ESPINHOS NO CHÃO (Espaçados para dar área segura entre eles) 
+        Hazard(450, ground_y - 20, 48, 20, world=WORLD_LIGHT),
+        Hazard(640, ground_y - 20, 48, 20, world=WORLD_SHADOW),
+        Hazard(810, ground_y - 20, 48, 20, world=WORLD_LIGHT),
 
-        # Inimigo da Luz patrulhando o chão do meio
-        Enemy(380, ground_y - ENEMY_SIZE, 350, 680, world=WORLD_LIGHT),
-        # Inimigo da Sombra patrulhando o chão da direita (antes do barranco)
-        Enemy(900, ground_y - ENEMY_SIZE, 720, 1070, world=WORLD_SHADOW),
+        #     ESPINHOS EM PLATAFORMAS (Posicionados no fundo, deixando a entrada livre) 
+        # Espinho na ponta direita da ilha mais alta (deixa 95px livres à esquerda para pousar)
+        Hazard(865, 315 - 20, 36, 20, world=WORLD_LIGHT),
+        # Espinho bem no canto direito do barranco roxo (deixa 130px livres na entrada)
+        Hazard(1225, 555 - 20, 45, 20, world=WORLD_SHADOW),
+
+        #     INIMIGOS DE PATRULHA (Apenas no chão, com rotas amplas) 
+        # Patrulha da Luz no chão central
+        Enemy(370, ground_y - ENEMY_SIZE, 345, 730, world=WORLD_LIGHT),
+        # Patrulha da Sombra no chão centro-direito (para antes do barranco)
+        Enemy(750, ground_y - ENEMY_SIZE, 700, 1065, world=WORLD_SHADOW),
     ]
 
     return {

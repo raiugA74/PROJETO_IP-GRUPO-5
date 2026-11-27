@@ -33,4 +33,4 @@ Em **One Vessel**, o jogador atravessa diferentes regiões alternando em tempo r
 | **Felipe Borges** | Coletáveis e Placar | Lógica dos itens coletáveis (cristais de Luz/Sombra e pó de penumbra), detecção de coleta e placar (`Scoreboard`). |
 | **Kaike Silva** | Inimigos e Obstáculos | Inimigos com patrulha (`Enemy`), espinhos/armadilhas (`Hazard`), visibilidade por mundo e detecção de dano. |
 | **Juan Henrique** | Menus e Narrativa | Interface do menu inicial e opções, persistência de configurações (`save.json`) e narrativa/ambientação do jogo. |
-| **Tiago Cardoso** | Sprites, Áudio e Efeitos | Animações do personagem (`PlayerAnimator` e `SpriteSheet`), artes de cenário/interface e efeitos sonoros (`AudioManager`). |
+| **Thiago Cardoso** | Sprites, Áudio e Efeitos | Animações do personagem (`PlayerAnimator` e `SpriteSheet`), artes de cenário/interface e efeitos sonoros (`AudioManager`). |
