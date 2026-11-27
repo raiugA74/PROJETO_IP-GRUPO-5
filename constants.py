@@ -44,3 +44,6 @@ HAZARD_GHOST_COLOR = (230, 150, 150)  # contorno do espinho quando é do outro m
 ENEMY_COLOR = (160, 30, 30)           # cor do inimigo
 ENEMY_SPEED = 2                       # quantos pixels o inimigo anda por quadro
 ENEMY_SIZE = 32                       # tamanho do inimigo (quadrado)
+
+LEVEL_WIDTH = 3000          # largura da fase em pixels (ajuste para a camera seguir o player)
+LEVEL_HEIGHT = SCREEN_HEIGHT
