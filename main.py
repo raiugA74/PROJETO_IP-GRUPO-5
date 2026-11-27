@@ -113,6 +113,28 @@ botao_pressionado = None  # botão que está sendo pressionado no momento
 hits = 0        # quantas vezes o jogador tomou dano (contador de teste)
 hit_timer = 0   # cronômetro pra não contar dano 60 vezes por segundo
 
+vidas = PLAYER_LIVES                # vidas restantes
+respawn_point = level.player_spawn  # onde o jogador renasce
+
+def respawnar():
+    # leva o jogador de volta ao ponto de respawn, sem perder o progresso
+    global current_world, hit_timer
+    player.rect.x, player.rect.y = respawn_point
+    player.vel_y = 0                  # zera a velocidade de queda
+    current_world = WORLD_LIGHT       # volta ao mundo da Luz
+    hit_timer = INVULN_FRAMES         # invulnerável por um tempo logo após renascer
+    animador.olhando_esquerda = False # renasce olhando para a direita, no sentido da fase até então
+    animador.ultimo_x = player.rect.x # o teleporte não conta como "andou para a esquerda"
+
+def reiniciar_partida():
+    # começa tudo do zero: vidas, danos e posição
+    global vidas, hits, respawn_point, estado
+    vidas = PLAYER_LIVES
+    hits = 0
+    respawn_point = level.player_spawn
+    respawnar()
+    estado = "jogo"
+
 particulas_menu = []  # cada item: [x, y, vx, vy, alpha]
 
 running = True
@@ -149,9 +171,7 @@ while running:  # loop principal: repete até fechar a janela
                 pos = event.pos # obtém a posição do mouse ao soltar o clique
                 if botao_pressionado is not None and botao_pressionado.collidepoint(pos): # se o botão pressionado é o mesmo que o mouse está sobre ao soltar
                     if botao_pressionado == rect_novo_jogo: # se o jogador clicou no botão de novo jogo, reinicia a fase e o jogador
-                        player.rect.x, player.rect.y = level.player_spawn # reinicia a posição do jogador
-                        current_world = WORLD_LIGHT # reinicia o mundo para o da Luz
-                        estado = "jogo" 
+                        reiniciar_partida() # zera vidas, danos e posição, e começa o jogo novamente
                     elif botao_pressionado == rect_continuar: # se o jogador clicou no botão de continuar, carrega o save do jogo
                         if os.path.exists("save/save.json"): # verifica se o arquivo de save existe
                             with open("save/save.json", "r") as f: # abre o arquivo de save
@@ -160,6 +180,9 @@ while running:  # loop principal: repete até fechar a janela
                                 player.rect.y = save_data["player_y"] # atualiza a posição do jogador
                                 current_world = save_data["current_world"] # atualiza o mundo atual
                                 scoreboard.counts = save_data["scores"] # atualiza os pontos
+                                vidas = save_data.get("vidas", PLAYER_LIVES) # saves antigos não têm vidas
+                                hits = save_data.get("hits", 0)
+                                hit_timer = 0
                             estado = "jogo"
                     elif botao_pressionado == rect_opcoes: # se o jogador clicou no botão de opções, muda para a tela de opções
                         estado_anterior = "menu"
@@ -231,7 +254,9 @@ while running:  # loop principal: repete até fechar a janela
                                 "player_x": player.rect.x,
                                 "player_y": player.rect.y,
                                 "current_world": current_world,
-                                "scores": scoreboard.counts
+                                "scores": scoreboard.counts,
+                                "vidas": vidas,
+                                "hits": hits
                             }, f)
                         estado = "menu"
 
@@ -354,6 +379,26 @@ while running:  # loop principal: repete até fechar a janela
 
         pygame.display.flip()
 
+    elif estado == "game_over": # para tela de game over com opções de continuar ou voltar ao menu
+        screen.fill((0, 0, 0))
+        font_titulo = pygame.font.SysFont("arial", 30)
+        t1 = font_titulo.render("Game Over", True, (255, 255, 255))
+        t2 = font.render("ENTER: tentar de novo   |   ESC: menu", True, (200, 200, 200))
+        screen.blit(t1, (SCREEN_WIDTH // 2 - t1.get_width() // 2, 250))
+        screen.blit(t2, (SCREEN_WIDTH // 2 - t2.get_width() // 2, 310))
+
+        for event in pygame.event.get():
+            if event.type == pygame.QUIT:
+                running = False
+            elif event.type == pygame.KEYDOWN:
+                if event.key == pygame.K_RETURN:
+                    reiniciar_partida()
+                elif event.key == pygame.K_ESCAPE:
+                    estado = "menu"
+
+        pygame.display.flip()
+        clock.tick(FPS)
+
     elif estado == "jogo":
         # 1. Eventos: o que o jogador fez?
         for event in pygame.event.get(): # detecta eventos do jogo (teclado, mouse, etc.)
@@ -364,7 +409,9 @@ while running:  # loop principal: repete até fechar a janela
                         "player_x": player.rect.x,
                         "player_y": player.rect.y,
                         "current_world": current_world,
-                        "scores": scoreboard.counts
+                        "scores": scoreboard.counts,
+                        "vidas": vidas,
+                        "hits": hits
                     }, f)
                 running = False
             if event.type == pygame.KEYDOWN: # detecta quando uma tecla é pressionada
@@ -389,8 +436,12 @@ while running:  # loop principal: repete até fechar a janela
 
         tocou = any(e.hits(player, current_world) for e in level.enemies)  # algo perigoso encostou?
         if tocou and hit_timer == 0:                # encostou e já passou o tempo de espera
-            hits += 1                               # conta 1 dano
-            hit_timer = 60                          # 1 segundo sem poder levar dano de novo
+            hits += 1                               # conta 1 dano/ PRECISA CONTAR DANO?
+            vidas -= 1                              # perde 1 vida
+            if vidas <= 0:
+                estado = "game_over"                # fim de jogo quando acabarem as vidas
+            else:
+                respawnar()                         # volta ao ponto de respawn 
 
         # 3. Cor da tela e animação do jogador conforme o mundo
         if current_world == WORLD_LIGHT:
@@ -409,11 +460,12 @@ while running:  # loop principal: repete até fechar a janela
         for enemy in level.enemies:             # desenha inimigos e espinhos
             enemy.draw(screen, current_world)
 
-        animador.draw(screen, player)           # desenha a sprite do jogador (no lugar de player.draw)
+        if hit_timer == 0 or (hit_timer // 5) % 2 == 0:   # pisca enquanto está invulnerável
+            animador.draw(screen, player)       # desenha a sprite do jogador (no lugar de player.draw)
         scoreboard.draw(screen, font)           # placar por cima de tudo
 
-        texto = font.render(f"Danos: {hits}", True, (255, 255, 255))  # monta o texto "Danos: N"
-        screen.blit(texto, (SCREEN_WIDTH - 140, 10))                  # põe no canto direito de cima
+        texto_vidas = font.render(f"Vidas: {vidas}", True, (255, 255, 255)) #fica no canto direito como um contador númerico, mas penso que três corações possam representar melhor, não sei
+        screen.blit(texto_vidas, (SCREEN_WIDTH - 140, 10))
 
         pygame.display.flip()
 
